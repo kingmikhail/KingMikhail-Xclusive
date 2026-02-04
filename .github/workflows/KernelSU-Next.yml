@@ -1,4 +1,4 @@
-name: KernelSU-Next
+name: KernelSU-Next Dev
 on:
   workflow_dispatch:
     inputs:
