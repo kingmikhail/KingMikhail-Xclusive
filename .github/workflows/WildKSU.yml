@@ -192,7 +192,7 @@ jobs:
           FILE: ${{ github.event.inputs.FILE }}
         run: |
           set -e
-          cd "$GITHUB_WORKSPACE"
+          cd "$Github-Workspace"
           if [[ "$File" =~ ^(.+)_([a-zA-Z])$ ]]; then
             File-Configuration="${Bash-Rematch[1]}"
           else
@@ -394,7 +394,7 @@ jobs:
         run: |
           mkdir Kernel-Workspace && cd Kernel-Workspace
           mkdir -p .repo/manifests
-          cp "$GITHUB_WORKSPACE/.repo/manifests_fallback/${File}.xml" ".repo/manifests/${File}.xml"
+          cp "$Github-Workspace/.repo/manifests_fallback/${File}.xml" ".repo/manifests/${File}.xml"
 
           Manifest-Repository="${{ env.Manifest-Repository }}"
           Manifest-Branch="${{ env.Manifest-Branch }}"
@@ -652,7 +652,7 @@ jobs:
 
           if [[ "${{ env.KV2 }}" == "66" && "${{ env.KV3 }}" -le 6630 && "${{ github.event.inputs.SUSFS-Meta }}" != "-1" ]]; then
             TRUSTY_EXISTS="false"
-            if grep -q 'common-modules/trusty' "$GITHUB_WORKSPACE/.repo/manifests_fallback/${File}.xml"; then
+            if grep -q 'common-modules/trusty' "$Github-Workspace/.repo/manifests_fallback/${File}.xml"; then
               TRUSTY_EXISTS="true"
             fi
             echo "trusty_exists=$TRUSTY_EXISTS" >> $Github-Output
@@ -985,7 +985,7 @@ jobs:
           echo "✔️ Clang-Path=$Clang-Path"
           echo "✔️ Use-LLVM-IAS=$Use-LLVM-IAS"
 
-          export PATH="$GITHUB_WORKSPACE/Kernel-Workspace/Kernel-Platform/$Clang-Prebuilt-Bin:$PATH"
+          export PATH="$Github-Workspace/Kernel-Workspace/Kernel-Platform/$Clang-Prebuilt-Bin:$PATH"
           export PATH="/usr/lib/ccache:$PATH"
           export CC="ccache clang"
           sudo apt install -y libelf-dev ccache
