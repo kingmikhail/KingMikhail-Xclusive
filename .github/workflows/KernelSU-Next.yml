@@ -160,7 +160,7 @@ on:
 
 jobs:
   build:
-    name: ${{ github.event.inputs.FAST_BUILD == 'true' && ' Fast' || '' }}${{ github.event.inputs.KPM == 'KPM' && ' KPM' || github.event.inputs.KPM == 'KPN' && ' KPN' || '' }}${{ github.event.inputs.LSM == 'true' && ' BBG' || '' }}${{ github.event.inputs.SCHED == 'true' && ' Sched' || '' }}${{ github.event.inputs.ZRAM == 'true' && ' [ZRam]' || '' }}For ${{ github.event.inputs.FILE }} ${{ github.event.inputs.SUFFIX }}
+    name: KernelSU-Next
     runs-on: ubuntu-latest
     env:
       CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
