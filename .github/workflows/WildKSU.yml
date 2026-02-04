@@ -133,7 +133,7 @@ on:
         default: true
       SCHED:
         type: boolean
-        description: "SHOULD WE ADD FENGCHI KERNEL?
+        description: "SHOULD WE ADD FENGCHI KERNEL?"
         required: true
         default: true
       ZRAM:
