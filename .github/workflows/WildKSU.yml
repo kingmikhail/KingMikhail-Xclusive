@@ -1,4 +1,4 @@
-name: WildKSU 
+name: WILDKSU CANARY
 on:
   workflow_dispatch:
     inputs:
@@ -164,7 +164,7 @@ on:
 
 jobs:
   build:
-    name: WildKSU
+    name: CANARY
     runs-on: ubuntu-latest
     env:
       CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
@@ -596,13 +596,11 @@ jobs:
           echo "manager_branch=$BRANCH" >> "$GITHUB_OUTPUT"
           echo "manager_artifact=$ARTIFACT" >> "$GITHUB_OUTPUT"
 
-      - name: ADDING WILDKSU
+      - name: ADDING WILDKSU CANARY
         run: |
           cd kernel_workspace/kernel_platform
           MANAGER_BRANCH="${{ steps.manager.outputs.manager_branch }}"
-          curl -LSs https://raw.githubusercontent.com/WildKernels/Wild_KSU/canary/kernel/setup.sh -o setup.sh
-          sed -n '1,200p' setup.sh
-          bash setup.sh canary
+          curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/canary/kernel/setup.sh" | bash -s canary
           cd Wild_KSU
           KSU_VERSION=$(expr $(curl -sI "https://api.github.com/repos/WildKernels/Wild_KSU/commits?sha=canary&per_page=1" | grep -i "link:" | sed -n 's/.*page=\([0-9]*\)>; rel="last".*/\1/p') "+" 30000)
           echo "KSUVER=$KSU_VERSION" >> $GITHUB_ENV
