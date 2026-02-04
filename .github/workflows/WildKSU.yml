@@ -1,4 +1,4 @@
-name: WildKSU
+name: WILDKSU
 on:
   workflow_dispatch:
     inputs:
@@ -164,7 +164,7 @@ on:
 
 jobs:
   build:
-    name: WILDKSU
+    name: BUILD WILDKSU
     runs-on: ubuntu-latest
     env:
       CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
@@ -175,7 +175,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Maximize Build Space
+      - name: MAXIMIZING BUILD SPACE
         if: ${{ github.event.inputs.SPACE_NOCLEAN == 'false' }}
         uses: easimon/maximize-build-space@master
         with:
@@ -206,7 +206,7 @@ jobs:
           echo "FILE_CONF=$FILE_CONF" >> $GITHUB_ENV
           echo "FILE_BASE=$FILE_BASE" >> $GITHUB_ENV
 
-          # Dynamically Calling Source Code Manifest Repository
+          # DYNAMIC CALLING SOURCE CODE MANIFEST REPOSITORY
           DYNAMIC_REPO_INPUT="${{ github.event.inputs.DYNAMIC_REPO }}"
           declare -A REPOS
           REPOS["kingmikhail"]="https://api.github.com/repos/kingmikhail/kernel_manifest"
@@ -219,7 +219,7 @@ jobs:
             local OWNER=$1
             local REPO_URL=$2
 
-            echo "Trying To Pull The ${OWNER} Branch List..."
+            echo "Trying To Pull ${OWNER} Branch List..."
             BRANCHES=$(curl -fsL ${REPO_URL}/branches | jq -r 'if type=="array" then .[].name else empty end' 2>/dev/null || true)
             if [[ -z "$BRANCHES" ]]; then
               echo "${OWNER} Failed To Retrieve Branch List, Try Re-running The Workflow"
@@ -229,7 +229,7 @@ jobs:
               XML_URL="https://raw.githubusercontent.com/${OWNER}/kernel_manifest/$BRANCH/${FILE}.xml"
               README_URL="https://raw.githubusercontent.com/${OWNER}/kernel_manifest/$BRANCH/README.md"
               if curl -sf --head "$XML_URL" > /dev/null; then
-                echo "✔️ Exist ${OWNER} Turn Up ${FILE}.xml (branch: $BRANCH)"
+                echo "✔️ Exists ${OWNER} Turn Up ${FILE}.xml (branch: $BRANCH)"
                 curl -s -o "$XML_PATH" "$XML_URL"
                 curl -s -o "$README_PATH" "$README_URL" || true
                 FOUND_REPO="$OWNER"
@@ -261,12 +261,12 @@ jobs:
             exit 1
           fi
 
-          # PARSE THE REVISION STRING
+          # PARSING REVISION STRING
           REVISION=$(grep -oP '<project[^>]+revision="\K[^"]+' "$XML_PATH" | head -n1 || true)
           echo "Parse File Get CPU And Android Version..."
-          # Extract CPU
+          # EXTRACTING CPU
           CPU=$(echo "$REVISION" | sed -E 's#^(oneplus|realme|oppo)/([^_]+).*#\2#')
-          # Extract Android Version
+          # EXTRACTING Android Version
           ANDROID_VERSION=$(echo "$REVISION" | grep -oP '\d{1,2}\.\d{1,2}(\.\d{1,2})?')
           if [[ -n "$CPU" && -n "$ANDROID_VERSION" ]]; then
             echo "✔️ CPU=$CPU, ANDROID_VERSION=$ANDROID_VERSION"
@@ -279,7 +279,7 @@ jobs:
             exit 1
           fi
 
-          echo "Parse README.md to obtain CPUD and BUILD_METHOD..."
+          echo "Parse Readme.md To Obtain CPUD And Build Methods..."
           if [[ -s "$README_PATH" ]]; then
             BUILD_LINE=$(grep -m1 'oplus_build_kernel.sh' "$README_PATH" || true)
             if [[ -n "$BUILD_LINE" ]]; then
@@ -289,10 +289,10 @@ jobs:
               echo "CPUD=$CPUD" >> $GITHUB_ENV
               echo "BUILD_METHOD=$BUILD_METHOD" >> $GITHUB_ENV
             else
-              echo "✖️ Build Command Was Not Found in README.md"
+              echo "✖️ Build Command Was Not Found in Readme.md"
             fi
           else
-            echo "✖️ Download Failed or Empty for README.md"
+            echo "✖️ Download Failed Or Empty For Readme.md"
           fi
           # Convey combined information
           echo "value=${FILE_BASE}_Android${ANDROID_VERSION}" >> "$GITHUB_OUTPUT"
@@ -388,7 +388,7 @@ jobs:
           chmod a+x ~/repo
           sudo mv ~/repo /usr/local/bin/repo
 
-      - name: INITIALIZING REPOSITORY AND SYNCHONIZATION
+      - name: INITIALIZING SYNC REPOSITORY
         env:
           FILE: ${{ github.event.inputs.FILE }}
         run: |
@@ -433,10 +433,10 @@ jobs:
             echo "No Branch Found in Build Configuration Files"
           fi
 
-          # Obtain the full kernel version number (TKERNEL_VERSION) and optional kernel level modification from the Makefile
+          # OBTAINING FULL KERNEL VERSION NUMBER AND OPTIONAL KERNEL LEVEL MODIFICATION FROM MAKEFILE
           ORIG_VERSION=$(awk '/^VERSION =/ {v=$3} /^PATCHLEVEL =/ {p=$3} /^SUBLEVEL =/ {s=$3} END {print v"."p"."s}' ./common/Makefile)
 
-          # Force modification of SUBLEVEL (kernel level)
+          # FORCING MODIFICATION TO SUBLEVEL
           SUBLEVEL_INPUT="${{ github.event.inputs.SUBLEVEL }}"
           if [ -n "$SUBLEVEL_INPUT" ]; then
             echo "Revising Sublevel for $SUBLEVEL_INPUT"
@@ -512,14 +512,14 @@ jobs:
           git commit -m "Custom suffix & removed -dirty"
 
       # SUFFIX IN PSEUDO-OFFICIAL FORMAT
-      - name: Custom Kernel Random Suffix if Empty
+      - name: CUSTOM KERNEL RANDOM SUFFIX (IF EMPTY)
         if: ${{ github.event.inputs.SUFFIX == '' }}
         run: |
           cd kernel_workspace
           KANDROID_VERSION="${{ env.KANDROID_VERSION }}"
           FAST_BUILD="${{ github.event.inputs.FAST_BUILD }}"
 
-          # Generate random numbers and random hashes
+          # GENERATING RANDOM NUMBERD AND HASHES
           RANDOM_DIGIT=$(od -An -N1 -tu1 < /dev/urandom | tr -d '[:space:]' | awk '{print $1 % 11}')
           RANDOM_HASH=$(od -An -N7 -tx1 /dev/urandom | tr -d ' \n')
           RANDOM_SUFFIX="${RANDOM_DIGIT}-o-g${RANDOM_HASH}"
@@ -703,8 +703,8 @@ jobs:
             fi
           fi
 
-      # GKI CONVERSION
-      - name: APPLYING CONVERT 
+      # CONVERSION
+      - name: APPLYING GKI CONVERSION
         if: ${{ fromJSON(env.KV1) >= 6 && fromJSON(env.KV2) >= 66 && github.event.inputs.SCHED == 'false' }}
         run: |
           PATCH_DIR="${GITHUB_WORKSPACE}/kernel_workspace/KingMikhail-Xclusive/Patches"
@@ -720,7 +720,7 @@ jobs:
           patch -p1 -F 3 < "${PATCH_DIR}/HMBIRD" || true
           echo "OGKI to GKI Patch Conversion Complete"
 
-      - name: APPLY UNICODE BYPASS
+      - name: APPLYING UNICODE
         if: ${{ github.event.inputs.UNICODE_BYPASS == 'true' }}
         run: |
           PATCH_DIR="${GITHUB_WORKSPACE}/kernel_workspace/KingMikhail-Xclusive/Patches"
@@ -731,7 +731,7 @@ jobs:
             patch -p1 --forward < "${PATCH_DIR}/Unicode-6.1-P" || true
           fi
 
-      - name: APPLYING MORE ZRAM ALGORITHM
+      - name: APPLYING ZRAM ALGORITHM
         if: ${{ github.event.inputs.ZRAM == 'true' }}
         run: |
           PATCH_DIR="${GITHUB_WORKSPACE}/kernel_workspace/SukiSU_patch/other/zram/zram_patch/${{ env.KERNEL_VERSION }}"
@@ -756,13 +756,13 @@ jobs:
             }
           done          
           git clone https://github.com/kingmikhail/KingMikhail-Xclusive.git -b $CPU || { echo "CPU Branch Doesn't Exist, Fengchi Kernel Doesn't Currently Support Device Model, Please Close and Try Again"; exit 11; }
-          echo "Pulling the Fengchi Windspeed Patch"
+          echo "Pulling Fengchi Patch"
           cp ./KingMikhail-Xclusive/fengchi_${FILE}.patch ./
           if [[ -f "fengchi_${FILE}.patch" ]]; then
-            echo "Applying the Fengchi Windspeed Patch"
+            echo "Applying Fengchi Patch"
             dos2unix "fengchi_${FILE}.patch"
             patch -p1 -F 3 < "fengchi_${FILE}.patch"
-            echo "Fengchi Windspeed Patch Complete"
+            echo "Fengchi Patch Complete"
           else
             echo "✖️ No Patch Found, Fengchi Kernel Doesn't Currently Support Device Model, Close And Try Again"
             exit 12
@@ -814,7 +814,7 @@ jobs:
           echo "CONFIG_TMPFS_XATTR=y" >> "$CONFIG_FILE"
           echo "CONFIG_TMPFS_POSIX_ACL=y" >> "$CONFIG_FILE"
 
-          # BBR & ECN CONFIGURATION
+          # BBR AND ECN CONFIGURATION
           if [ "${{ github.event.inputs.BBR_ECN }}" = "true" ]; then
             echo "CONFIG_TCP_CONG_ADVANCED=y" >> "$CONFIG_FILE"
             echo "CONFIG_TCP_CONG_BBR=y" >> "$CONFIG_FILE"
@@ -897,7 +897,7 @@ jobs:
           INPUT_TIME="${{ github.event.inputs.BUILD_TIME }}"
           if [[ -n "$INPUT_TIME" && "$INPUT_TIME" != "F" && "$INPUT_TIME" != "f" ]]; then
             DATESTR="$INPUT_TIME"
-            echo "Using input build time: $DATESTR"
+            echo "Using Input Build Time: $DATESTR"
           else
             DATESTR="$(TZ='UTC' date +'%a %b %d %T %Z %Y')"
                         echo "Using UTC Time As Fallback: $DATESTR"
@@ -930,7 +930,7 @@ jobs:
       - name: DISABLE GPUEB
         if: ${{ env.KERNEL_VERSION == '5.10' && startsWith(env.CPU, 'mt') }}
         run: |
-          echo "Disabling GPUEB for Mediatek Kernel 5.10"
+          echo "Disabling GPUEB For Mediatek Kernel Version 5.10"
           sed -i '/obj-y.*gpueb/d' kernel_workspace/kernel-5.10/drivers/gpu/mediatek/Makefile
 
       - name: BUILD KERNEL FAST
@@ -940,14 +940,14 @@ jobs:
           KERNEL_VERSION="${{ env.KERNEL_VERSION }}"
           cd kernel_workspace/kernel_platform
 
-          # Automatic Detection of LLVM IAS
+          # AUTO DETECTION OF LLVM IAS
           if [[ -f ./common/build.config.arm ]] && grep -q '^LLVM_IAS=1' ./common/build.config.arm; then
             USE_LLVM_IAS=true
           else
             USE_LLVM_IAS=false
           fi
 
-          # Read Clang Prebuilt Bin From Build Config Common
+          # READ CLANG PREBUILT BIN FROM BUILD CONFIGURATION
           CLANG_PREBUILT_BIN=$(grep '^CLANG_PREBUILT_BIN=' ./common/build.config.common | cut -d'=' -f2 || true)
           if [[ -z "$CLANG_PREBUILT_BIN" ]]; then
             echo "Clang Prebuilt Bin Was Not Found in Build Configuration Common, Revert To The Official Build Script"
@@ -956,11 +956,11 @@ jobs:
             exit 0
           fi
 
-          # Try Extracting The Clang-R Version From Clang Version First
+          # EXTRACTING CLANG VERSION
           if [[ "$CLANG_PREBUILT_BIN" =~ (clang-r[0-9a-z]+) ]]; then
             CLANG_VERSION="${BASH_REMATCH[1]}"
           else
-            # If No Match Is Found, Try Extracting From Build Configuration Constants
+            # IF NO MATCH Found, EXTRACTING FROM BUILD CONFIGURATION CONSTANTS 
             if [[ -f ./common/build.config.constants ]]; then
               CLANG_VERSION=$(grep '^CLANG_VERSION=' ./common/build.config.constants | cut -d'=' -f2 || true)
             fi
@@ -973,11 +973,11 @@ jobs:
             exit 0
           fi
 
-          # Replace With The New Clang Version Value
+          # REPLACE WITH NEW CLANG VERSION VALUE 
           CLANG_PREBUILT_BIN=${CLANG_PREBUILT_BIN/\$\{CLANG_VERSION\}/$CLANG_VERSION}
-          # Get The First Directory Name Of Clang Prebuilt Bin And Assign It To Clang Dir
+          # GET THE FIRST DIRECTORY NAME OF CLANG PREBUILT BIN AND ASSIGN IT TO CLANG DIRECTORY
           CLANG_DIR=$(echo "$CLANG_PREBUILT_BIN" | cut -d'/' -f1)
-          # Get The Parent Directory Name Of Clang Prebuilt Bin And Assign It To Clang Path
+          # GET THE PARENT DIRECTORY NAME OF CLANG PREBUILT BIN AND ASSIGN IT TO CLANG PATH 
           CLANG_PATH=$(basename "$(dirname "$CLANG_PREBUILT_BIN")")
 
           echo "✔️ CLANG_VERSION=$CLANG_VERSION"
@@ -1141,7 +1141,7 @@ jobs:
           done
 
           if [ "$success" -ne 1 ]; then
-            echo "✖️ Unable to Obtain the ZRAM Module Download Link after $retries of Consecutive Attempts"
+            echo "✖️ Unable To Obtain The ZRAM Module Download Link After $retries Of Consecutive Attempts"
             echo "upload=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
