@@ -1,4 +1,4 @@
-name: Wild-KSU Hybrid
+name: WildKSU
 on:
   workflow_dispatch:
     inputs:
@@ -240,13 +240,13 @@ jobs:
             return 1
           }
 
-          # Default Repository File Search
+          # DEFAULT REPOSITORY FILE SEARCH
           if check_repo "kingmikhail" "${REPOS["kingmikhail"]}"; then
             echo "MANIFEST_REPO=kingmikhail" >> $GITHUB_ENV
             echo "MANIFEST_BRANCH=$FOUND_BRANCH" >> $GITHUB_ENV
           fi
 
-          # Dynamic Repository File Search
+          # DYNAMIC REPOSITORY FILE SEARCH
           if [[ -z "$FOUND_REPO" ]]; then
             DYNAMIC_URL="${REPOS["Dynamic"]}"
             DYNAMIC_OWNER=$(echo "$DYNAMIC_URL" | sed -E 's#https://api.github.com/repos/([^/]+)/.*#\1#')
@@ -261,7 +261,7 @@ jobs:
             exit 1
           fi
 
-          # Parse The Revision String
+          # PARSE THE REVISION STRING
           REVISION=$(grep -oP '<project[^>]+revision="\K[^"]+' "$XML_PATH" | head -n1 || true)
           echo "Parse File Get CPU And Android Version..."
           # Extract CPU
@@ -297,7 +297,7 @@ jobs:
           # Convey combined information
           echo "value=${FILE_BASE}_Android${ANDROID_VERSION}" >> "$GITHUB_OUTPUT"
 
-      - name: Debug Show Selected Inputs
+      - name: DEBUG SHOW SELECTED INPUTS
         run: |
           echo "-----------------------"
           echo "Selected CPU: ${{ env.CPU }}"
@@ -326,10 +326,10 @@ jobs:
           echo "Selected XUS_FIX: ${{ github.event.inputs.XUS_FIX }}"
           echo "-----------------------"
 
-      - name: Check Disk Space
+      - name: CHECKING DISK SPACE
         run: df -h
 
-      - name: Create and Enable 3G Swap
+      - name: CREATING AND ENABLING 3G SWAP
         run: |
           sudo swapoff -a
           sudo fallocate -l 3G /swapfile
@@ -338,32 +338,32 @@ jobs:
           sudo swapon /swapfile
           free -h
 
-      - name: Set Cache Environment
+      - name: SETTING CACHE ENVIRONMENT
         if: ${{ github.event.inputs.BUILD_NOCCACHE == 'false' }}
         run: |
           echo "CCACHE_DIR=$HOME/.ccache_${{ github.event.inputs.FILE }}" >> $GITHUB_ENV
           mkdir -p "$HOME/.ccache_${{ github.event.inputs.FILE }}"
           echo "set: $HOME/.ccache_${{ github.event.inputs.FILE }}"
 
-      - name: Configure Github
+      - name: CONFIGURING GITHUB
         run: |
           git config --global user.name "kingmikhail"
           git config --global user.email "andreimikhail987@gmail.com"
 
-      - name: Install Dependencies + APTC
+      - name: INSTALLING DEPENDENCIES + APTC
         uses: awalsh128/cache-apt-pkgs-action@latest 
         with: 
           packages: python3 git curl ccache libelf-dev build-essential flex bison libssl-dev libncurses-dev liblz4-tool zlib1g-dev libxml2-utils rsync unzip gawk dos2unix
           execute_install_scripts: true
 
-      - name: Restore Ccache
+      - name: RESTORING CCACHE
         if: ${{ github.event.inputs.BUILD_NOCCACHE == 'false' }}
         uses: actions/cache@v3
         with:
           path: ${{ env.CCACHE_DIR }}
           key: ccache-${{ runner.os }}-${{ github.ref_name }}-${{ github.event.inputs.FILE }}-${{ env.BUILD_METHOD }}-${{ github.event.inputs.FAST_BUILD == 'true' && 'alpha' || 'beta' }}-16
 
-      - name: Initializing Ccache
+      - name: INITIALIZING CCACHE
         if: ${{ github.event.inputs.BUILD_NOCCACHE == 'false' }}
         run: |
           INIT_FLAG="${{ env.CCACHE_DIR }}/.ccache_initialized"
@@ -382,13 +382,13 @@ jobs:
           fi
           ccache -s
 
-      - name: Installing Repository Tool
+      - name: INSTALLING REPOSITORY TOOL
         run: |
           curl https://storage.googleapis.com/git-repo-downloads/repo > ~/repo
           chmod a+x ~/repo
           sudo mv ~/repo /usr/local/bin/repo
 
-      - name: Initializing Repository and Synchonization
+      - name: INITIALIZING REPOSITORY AND SYNCHONIZATION
         env:
           FILE: ${{ github.event.inputs.FILE }}
         run: |
@@ -415,7 +415,7 @@ jobs:
             rm -f "$dir/android/abi_gki_protected_exports_"* 2>/dev/null || echo "No protected exports in $dir"
           done
 
-      - name: Kernel Version Handling
+      - name: KERNEL VERSION HANDLING
         run: |
           cd kernel_workspace/kernel_platform
           # Get the Android kernel version number (KANDROID_VERSION) and the kernel version number (KERNEL_VERSION)
@@ -442,10 +442,10 @@ jobs:
             echo "Revising Sublevel for $SUBLEVEL_INPUT"
             sed -i "s/^\(SUBLEVEL[[:space:]]*=[[:space:]]*\).*/\1$SUBLEVEL_INPUT/" ./common/Makefile
           else
-            echo "Sublevel is not specified, Default Value will be Retained"
+            echo "Sublevel Is Not specified, Default Value Will Be Retained"
           fi
 
-          # Read the modified version
+          # READ THE MODIFIED VERSION
           NEW_VERSION=$(awk '/^VERSION =/ {v=$3} /^PATCHLEVEL =/ {p=$3} /^SUBLEVEL =/ {s=$3} END {print v"."p"."s}' ./common/Makefile)
 
           if [ "$ORIG_VERSION" != "$NEW_VERSION" ]; then
@@ -461,8 +461,8 @@ jobs:
           echo "KV2=${BRANCH#*-}"       | tr -d '.' >> $GITHUB_ENV
           echo "KV3=${NEW_VERSION}"     | tr -d '.' >> $GITHUB_ENV
 
-      # Custom kernel Suffix
-      - name: Custom Kernel Suffix if Set
+      # CUSTOM KERNEL SUFFIX
+      - name: CUSTOM KERNEL SUFFIX IF SET
         if: ${{ github.event.inputs.SUFFIX != '' }}
         run: |
           cd kernel_workspace
@@ -479,7 +479,7 @@ jobs:
 
             echo "Modifying: $path"
 
-            # Remove -dirty
+            # REMOVE -DIRTY
             sed -i 's/ -dirty//g' "$path"
             sed -i '$i res=$(echo "$res" | sed '\''s/-dirty//g'\'')' "$path"
 
@@ -511,7 +511,7 @@ jobs:
           git add -A
           git commit -m "Custom suffix & removed -dirty"
 
-      # A random suffix in pseudo-official format (only effective if SUFFIX is not set)*
+      # SUFFIX IN PSEUDO-OFFICIAL FORMAT
       - name: Custom Kernel Random Suffix if Empty
         if: ${{ github.event.inputs.SUFFIX == '' }}
         run: |
@@ -533,7 +533,7 @@ jobs:
 
             echo "Modifying: $path"
 
-            # Remove -dirty
+            # REMOVE -DIRTY
             sed -i 's/ -dirty//g' "$path"
             sed -i '$i res=$(echo "$res" | sed '\''s/-dirty//g'\'')' "$path"
 
@@ -561,7 +561,7 @@ jobs:
           git add -A
           git commit -m "Random suffix & remove -dirty"
 
-      - name: Resolve Manager Source
+      - name: RESOLVING MANAGER SOURCE
         id: manager
         run: |
           MANAGER_SOURCE="${{ github.event.inputs.MANAGER_SOURCE }}"
@@ -597,7 +597,7 @@ jobs:
           echo "manager_branch=$BRANCH" >> "$GITHUB_OUTPUT"
           echo "manager_artifact=$ARTIFACT" >> "$GITHUB_OUTPUT"
 
-      - name: Adding WildKernels WildKSU
+      - name: ADDING WILDKERNELS WILDKSU
         run: |
           cd kernel_workspace/kernel_platform
           MANAGER_BRANCH="${{ steps.manager.outputs.manager_branch }}"
@@ -609,7 +609,7 @@ jobs:
           KSU_GIT_TAG=$(curl -sL "https://api.github.com/repos/WildKernels/Wild_KSU/tags" | grep -o '"name": *"[^"]*"' | head -n 1 | sed 's/"name": "//;s/"//')
           sed -i "s/KSU_VERSION_TAG_FALLBACK := v0.0.1/KSU_VERSION_TAG_FALLBACK := $KSU_GIT_TAG/g" kernel/Kbuild
 
-      - name: Applying Patches Wildkernels WildKSU
+      - name: APPLYING PATCHES WILDKERNELS WILDKSU
         env:
           FILE: ${{ github.event.inputs.FILE }}
         run: |
@@ -657,14 +657,14 @@ jobs:
             fi
             echo "trusty_exists=$TRUSTY_EXISTS" >> $GITHUB_OUTPUT
             if [[ "$TRUSTY_EXISTS" == "false" ]]; then
-              echo "Fixed a SUSFS Error Caused by the Absence of Trusty in the Source Code and Inventory for Models with Kernel Versions 6.6.0~6.6.30"
+              echo "Fixed a SUSFS Error Caused By Absence Of Trusty In The Source Code And Inventory For Models With Kernel Versions 6.6.0~6.6.30"
               sed -i 's/-32,12 +32,38/-32,11 +32,37/g' 50_add_susfs_in_gki-${{ env.KANDROID_VERSION }}-${{ env.KERNEL_VERSION }}.patch
               sed -i '/#include <trace\/hooks\/fs.h>/d' 50_add_susfs_in_gki-${{ env.KANDROID_VERSION }}-${{ env.KERNEL_VERSION }}.patch
             fi
           fi
 
           if [ "${{ github.event.inputs.SUSFS_META }}" != "-1" ]; then
-            # Fake Patch to Fix Failures
+            # FAKE PATCH TO FIX FAILURES
             fake_patched=0
             if [ "$GKI_V" = "android15-6.6" ]; then
               if ! grep -qxF $'\tunsigned int nr_subpages = __PAGE_SIZE / PAGE_SIZE;' ./fs/proc/task_mmu.c; then
@@ -684,7 +684,7 @@ jobs:
             patch -p1 < 50_add_susfs_in_gki-${{ env.KANDROID_VERSION }}-${{ env.KERNEL_VERSION }}.patch || true
             echo "SUSFS Patch Complete"
 
-            # Revert
+            # REVERT
             if [ "$fake_patched" = 1 ]; then
               if [ "$GKI_V" = "android15-6.6" ]; then
                 if grep -qxF $'\tunsigned int nr_subpages = __PAGE_SIZE / PAGE_SIZE;' ./fs/proc/task_mmu.c; then
@@ -703,8 +703,8 @@ jobs:
             fi
           fi
 
-      # OGKI to GKI conversion, No Dtbo Boot Modification Required
-      - name: Apply Convert Hmbird OGKI to Hmbird GKI
+      # GKI CONVERSION
+      - name: APPLYING CONVERT 
         if: ${{ fromJSON(env.KV1) >= 6 && fromJSON(env.KV2) >= 66 && github.event.inputs.SCHED == 'false' }}
         run: |
           PATCH_DIR="${GITHUB_WORKSPACE}/kernel_workspace/KingMikhail-Xclusive/Patches"
@@ -768,7 +768,7 @@ jobs:
             exit 12
           fi
 
-      - name: APPLY BBG LSM
+      - name: APPLYING BBG LSM
         if: ${{ github.event.inputs.LSM == 'true' }}
         run: |
           cd kernel_workspace/kernel_platform/common
@@ -776,17 +776,17 @@ jobs:
           curl -LSs https://raw.githubusercontent.com/vc-teahouse/Baseband-guard/main/setup.sh | bash -s fix_blkdev_rename
           sed -i '/^config LSM$/,/^help$/{ /^[[:space:]]*default/ { /baseband_guard/! s/selinux/selinux,baseband_guard/ } }' ./security/Kconfig
 
-      # Configuration Information, Marked With An Asterisk Indicates Additional Items, That Carry Certain Degree Of Risk And Uncertainty
+      # CONFIGURATION INFORMATION, MARKED WITH AN ASTERISK INDICATES ADDITIONAL ITEMS, THAT CARRY CERTAIN DEGREE OF RISK AND UNCERTAINTY
       - name: ADDING CONFIGURATION SETTINGS
         run: |
           cd kernel_workspace/kernel_platform/common
           CONFIG_FILE=./arch/arm64/configs/gki_defconfig
           KERNEL_VERSION="${{ env.KERNEL_VERSION }}"
 
-          # WildKernels WildKSU Configuration
+          # WILDKERNELS WILDKSU CONFIGURATION
           echo "CONFIG_KSU=y" >> "$CONFIG_FILE"
 
-          # KPM Configuration
+          # KPM CONFIGURATION
           if [ "${{ github.event.inputs.KPM }}" = "KPM" ] || [ "${{ github.event.inputs.KPM }}" = "None" ]; then
             echo "CONFIG_KPM=y" >> "$CONFIG_FILE"
           fi
@@ -794,7 +794,7 @@ jobs:
             echo "CONFIG_KPM=n" >> "$CONFIG_FILE"
           fi
 
-          # SUSFS Configuration
+          # SUSFS CONFIGURATION
           if [ "${{ github.event.inputs.SUSFS_META }}" != "-1" ]; then
             echo "CONFIG_KSU_SUSFS=y" >> "$CONFIG_FILE"
             echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> "$CONFIG_FILE"
@@ -810,11 +810,11 @@ jobs:
             echo "CONFIG_KSU_SUSFS=n" >> "$CONFIG_FILE"
           fi
 
-          # TMPFS Configuration*
+          # TMPFS CONFIGURATION
           echo "CONFIG_TMPFS_XATTR=y" >> "$CONFIG_FILE"
           echo "CONFIG_TMPFS_POSIX_ACL=y" >> "$CONFIG_FILE"
 
-          # BBR & ECN Configuration*
+          # BBR & ECN CONFIGURATION
           if [ "${{ github.event.inputs.BBR_ECN }}" = "true" ]; then
             echo "CONFIG_TCP_CONG_ADVANCED=y" >> "$CONFIG_FILE"
             echo "CONFIG_TCP_CONG_BBR=y" >> "$CONFIG_FILE"
@@ -828,7 +828,7 @@ jobs:
             echo "CONFIG_IP_NF_TARGET_ECN=y" >> "$CONFIG_FILE"
           fi
 
-          # ZRAM Configuration*
+          # ZRAM CONFIGURATION
           if [ "${{ github.event.inputs.ZRAM }}" = "true" ]; then
             echo "CONFIG_CRYPTO_LZ4HC=y" >> "$CONFIG_FILE"
             echo "CONFIG_CRYPTO_LZ4K=y" >> "$CONFIG_FILE"
@@ -838,12 +838,12 @@ jobs:
             echo "CONFIG_ZRAM_WRITEBACK=y" >> "$CONFIG_FILE"
           fi
 
-          # LSM Configuration*
+          # BBG CONFIGURATION
           if [ "${{ github.event.inputs.LSM }}" = "true" ]; then
             echo "CONFIG_BBG=y" >> "$CONFIG_FILE"
           fi
 
-          # IPSET & IPV6 NAT Configuration*
+          # IPSET & IPV6 CONFIGURATION
           if [[ "${CPU}" == sm* && "${{ github.event.inputs.NETFILTER }}" == "true" ]]; then
             echo "CONFIG_BPF_STREAM_PARSER=y" >> "$CONFIG_FILE"
             echo "CONFIG_NETFILTER_XT_MATCH_ADDRTYPE=y" >> "$CONFIG_FILE"
@@ -870,15 +870,15 @@ jobs:
             echo "CONFIG_IP6_NF_TARGET_MASQUERADE=y" >> "$CONFIG_FILE"
           fi
 
-          # Fix Build Issues
+          # FIXING BUILD ISSUES
           if [ "$KERNEL_VERSION" = "6.1" ] && [[ "$CPU" == mt* ]]; then
             echo "CONFIG_DEBUG_INFO_BTF=n" >> "$CONFIG_FILE"
           fi
 
-          # Remove Build Review
+          # REMOVING BUILD REVIEW
           sed -i 's/check_defconfig//' ./build.config.gki
 
-      - name: FIX IPV6 NAT ERROR
+      - name: FIXING IPV6 ERROR
         if: ${{ github.event.inputs.NETFILTER == 'true' }}
         run: |
           PATCH_DIR="${GITHUB_WORKSPACE}/kernel_workspace/KingMikhail-Xclusive/Patches"
@@ -890,7 +890,7 @@ jobs:
             echo "Your Device Does Not Support IPV6 NAT, Skip This Step"
           fi
 
-      # Custom Kernel Build Time, Without Adding #1 SMP PREEMPT
+      # CUSTOM KERNEL BUILD TIME, WITHOUT ADDING #1 SMP PREEMPT
       - name: CUSTOM BUILD TIME
         shell: bash
         run: |
