@@ -164,7 +164,7 @@ on:
 
 jobs:
   build:
-    name: KernelSU-Next
+    name: WildKSU
     runs-on: ubuntu-latest
     env:
       CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
