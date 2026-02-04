@@ -806,22 +806,28 @@ jobs:
           patch -p1 -F 3 < "${PATCH_DIR}/lz4k_oplus.patch" || true
           echo 'LZ4K OnePlus complete'
 
-      - name: Apply Sched
+      - name: APPLYING FENGCHI KERNEL
         env:
           FILE: ${{ github.event.inputs.FILE }}
         if: ${{ github.event.inputs.SCHED == 'true' }}
         run: |
           cd kernel_workspace/kernel_platform/common
-          git clone https://github.com/Numbersf/SCHED_PATCH.git -b $CPU || { echo "❌ The CPU branch does not exist, the Fengchi kernel does not currently support your device model, please close and try again"; exit 11; }
-          echo "Pulling the Windspeed patch"
-          cp ./SCHED_PATCH/fengchi_${FILE}.patch ./
+          for p in ./kernel/sched/hmbird* ./vendor/oplus/kernel/cpu/sched_ext/hmbird*; do
+            [ -d "$p" ] && {
+              echo "The Code for Fengchi Already Exists in the Source Code, Enabling Secondary Rollback"
+              exit 0
+            }
+          done          
+          git clone https://github.com/kingmikhail/KingMikhail-Xclusive.git -b $CPU || { echo "CPU Branch Doesn't Exist, Fengchi Kernel Doesn't Currently Support Device Model, Please Close and Try Again"; exit 11; }
+          echo "Pulling the Fengchi Windspeed Patch"
+          cp ./KingMikhail-Xclusive/fengchi_${FILE}.patch ./
           if [[ -f "fengchi_${FILE}.patch" ]]; then
-            echo "Applying the Windspeed patch"
+            echo "Applying the Fengchi Windspeed Patch"
             dos2unix "fengchi_${FILE}.patch"
             patch -p1 -F 3 < "fengchi_${FILE}.patch"
-            echo "fengchi_patch完成"
+            echo "Fengchi Windspeed Patch Complete"
           else
-            echo "❌ No patch found, the Windspeed kernel does not currently support your device model, please close and try again"
+            echo "✖️ No Patch Found, Fengchi Kernel Doesn't Currently Support Device Model, Close And Try Again"
             exit 12
           fi
 
