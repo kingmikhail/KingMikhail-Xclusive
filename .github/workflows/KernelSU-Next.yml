@@ -624,7 +624,7 @@ jobs:
 
           if [ "$GKI_V" == "android13-5.15" ] && [ "$SUBLEVEL" -lt 123 ]; then
             echo "Fixed some Bugs Caused by Kernel Versions 5.15.0~5.15.123 only Supporting Older Versions of the C Library"
-            cp ../../KingMikhail-Xclusive/patches/5.15-Legacy ./5.15-Legacy.patch
+            cp ../../KingMikhail-Xclusive/Patches/5.15-Legacy ./5.15-Legacy.patch
             patch -p1 < 5.15-Legacy.patch
             echo "5.15 Patch Complete"
           fi
