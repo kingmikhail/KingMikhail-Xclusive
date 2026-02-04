@@ -199,9 +199,9 @@ jobs:
             File-Configuration="$File"
           fi
           FILE_BASE=$(echo "$File-Configuration" | sed -E 's/_([a-zA-Z0-9])/\U\1/g; s/^oneplus/OnePlus/; s/^realme/Realme/; s/^oppo/Oppo/')
-          mkdir -p ".repo/manifests_fallback"
-          XML-Path=".repo/manifests_fallback/${File}.xml"
-          README_PATH=".repo/manifests_fallback/README.md"
+          mkdir -p ".repo/Manifests-Fallback"
+          XML-Path=".repo/Manifests-Fallback/${File}.xml"
+          Readme-Path=".repo/Manifests-Fallback/README.md"
           echo "Deal With FILE=$File, CONF=$File-Configuration, BASE=$File-Base"
           echo "File-Configuration=$File-Configuration" >> $Github-Environment
           echo "FILE_BASE=$File-Base" >> $Github-Environment
@@ -394,7 +394,7 @@ jobs:
         run: |
           mkdir Kernel-Workspace && cd Kernel-Workspace
           mkdir -p .repo/manifests
-          cp "$Github-Workspace/.repo/manifests_fallback/${File}.xml" ".repo/manifests/${File}.xml"
+          cp "$Github-Workspace/.repo/Manifests-Fallback/${File}.xml" ".repo/manifests/${File}.xml"
 
           Manifest-Repository="${{ env.Manifest-Repository }}"
           Manifest-Branch="${{ env.Manifest-Branch }}"
@@ -652,7 +652,7 @@ jobs:
 
           if [[ "${{ env.KV2 }}" == "66" && "${{ env.KV3 }}" -le 6630 && "${{ github.event.inputs.SUSFS-Meta }}" != "-1" ]]; then
             TRUSTY_EXISTS="false"
-            if grep -q 'common-modules/trusty' "$Github-Workspace/.repo/manifests_fallback/${File}.xml"; then
+            if grep -q 'common-modules/trusty' "$Github-Workspace/.repo/Manifests-Fallback/${File}.xml"; then
               TRUSTY_EXISTS="true"
             fi
             echo "trusty_exists=$TRUSTY_EXISTS" >> $Github-Output
