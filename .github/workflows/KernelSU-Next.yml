@@ -736,7 +736,7 @@ jobs:
           done          
           git clone https://github.com/kingmikhail/KingMikhail-Xclusive.git -b $CPU || { echo "CPU Branch Doesn't Exist, Fengchi Kernel Doesn't Currently Support Device Model, Please Close and Try Again"; exit 11; }
           echo "Pulling the Fengchi Windspeed Patch"
-          cp ./KingMikhail-Xclusive-Build/fengchi_${FILE}.patch ./
+          cp ./KingMikhail-Xclusive/fengchi_${FILE}.patch ./
           if [[ -f "fengchi_${FILE}.patch" ]]; then
             echo "Applying the Fengchi Windspeed Patch"
             dos2unix "fengchi_${FILE}.patch"
