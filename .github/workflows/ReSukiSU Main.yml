@@ -56,7 +56,7 @@ on:
         type: choice
         description: "Manager calling direction"
         required: true
-        default: NEW
+        default: OFFICIAL
         options:
           - OFFICIAL
           - SPOOF
