@@ -696,10 +696,10 @@ jobs:
 
           if [ "${{ github.event.inputs.ZRAM }}" = "true" ]; then
             echo "Pulling ZRAM patch"
-            cp -r ../SukiSU_patch/other/zram/lz4k/include/linux/* ./common/include/linux/
-            cp -r ../SukiSU_patch/other/zram/lz4k/lib/* ./common/lib/
-            cp -r ../SukiSU_patch/other/zram/lz4k/crypto/* ./common/crypto/
-            cp -r ../SukiSU_patch/other/zram/lz4k_oplus ./common/lib/
+            cp -r ../SukiSU-Patch/other/zram/lz4k/include/linux/* ./common/include/linux/
+            cp -r ../SukiSU-Patch/other/zram/lz4k/lib/* ./common/lib/
+            cp -r ../SukiSU-Patch/other/zram/lz4k/crypto/* ./common/crypto/
+            cp -r ../SukiSU-Patch/other/zram/lz4k_oplus ./common/lib/
           fi
 
           cd ./common
@@ -797,7 +797,7 @@ jobs:
       - name: ZRAM ALGORITHM
         if: ${{ github.event.inputs.ZRAM == 'true' }}
         run: |
-          PATCH_DIR="${GITHUB_WORKSPACE}/kernel_workspace/SukiSU_patch/other/zram/zram_patch/${{ env.KERNEL_VERSION }}"
+          PATCH_DIR="${GITHUB_WORKSPACE}/kernel_workspace/SukiSU-Patch/other/zram/zram_patch/${{ env.KERNEL_VERSION }}"
           cd kernel_workspace/kernel_platform/common
           echo "Currently applying the LZ4KD patch"
           patch -p1 -F 3 < "${PATCH_DIR}/lz4kd.patch" || true
