@@ -99,7 +99,7 @@ on:
         type: string
         description: "Branch Name (required) / Custom Version Identifier (Leave Blank And Do Not Modify) / Revert Branch Commit Hash Version (Leave Blank And Do Not Modify)"
         required: false
-        default: "builtin/KingMikhail/"
+        default: "main/KingMikhail/"
       SUFFIX:
         type: string
         description: "Custom Kernel Suffix (Use Random String If Not Specified)"
