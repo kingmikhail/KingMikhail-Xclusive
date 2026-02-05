@@ -64,110 +64,110 @@ on:
           - New-Spoof
       SUSFS_CI:
         type: choice
-        description: "SUSFS Module Download Call Direction"
+        description: "SuSFS Module Download Call Direction"
         required: true
-        default: NoN
+        default: CI
         options:
           - CI
           - Release
-          - NoN
+          - None
       KPM:
         type: choice
-        description: "Kernel module implementation"
+        description: "Kernel Module Implementation"
         required: true
         default: KPM
         options:
           - KPM
           - KPN
-          - NoN
+          - None
       SUSFS_META:
         type: string
-        description: "Rollback SUSFS to a specified hash version"
+        description: "Rollback SuSFS To Specified Hash Version"
         required: false
         default: ""
       DYNAMIC_REPO:
         type: string
-        description: "Dynamic inventory warehouse owner"
+        description: "Dynamic Inventory Warehouse Owner"
         required: true
         default: "kingmikhail"
       BUILD_TIME:
         type: string
-        description: Custom build time (Enter F to use current UTC time)"
+        description: Custom Build Time (Enter F To Use Current UTC Time)"
         required: false
         default: "Sat Jan 31 11:11:11 UTC 2026"
       KSU_META:
         type: string
-        description: "Branch name (required) / Custom version identifier (leave blank and do not modify) / Revert branch commit hash version (leave blank and do not modify)"
+        description: "Branch Name (required) / Custom Version Identifier (Leave Blank And Do Not Modify) / Revert Branch Commit Hash Version (Leave Blank And Do Not Modify)"
         required: false
         default: "builtin/KingMikhail/"
       SUFFIX:
         type: string
-        description: "Custom kernel suffix (use random string if not specified)"
+        description: "Custom Kernel Suffix (Use Random String If Not Specified)"
         required: false
         default: "KingMikhail-Xclusive"
       SUBLEVEL:
-        description: "Custom kernel level spoofing(SUBLEVEL)"
+        description: "Custom Kernel Level Spoofing (Sublevel)"
         required: false
         default: ""
       FAST_BUILD:
         type: boolean
-        description: "Enable rapid build?"
+        description: "Enable Fast Build?"
         required: true
         default: true
       LSM:
         type: boolean
-        description: "Should the critical partition write protection module (BBG) be enabled?"
+        description: "Critical Partition Write Protection Module (Baseband Guard) Be Enabled?"
         required: true
         default: true
       NETFILTER:
         type: boolean
-        description: "Should we enable Network Function Extensions (NETFILTER)?"
+        description: "Enable Network Function Extensions (Netfilter)?"
         required: true
         default: true
       BBR_ECN:
         type: boolean
-        description: "Should we enable the network optimization algorithm (BBR+ECN)?"
+        description: "Enable Network Optimization Algorithm (BBR+ECN)?"
         required: true
         default: true
       UNICODE_BYPASS:
         type: boolean
-        description: "Should we add a fix for the Unicode invisible code point bypass read vulnerability?"
+        description: "Add Fix For Unicode invisible Code Point Bypass Read Vulnerability?"
         required: true
         default: true
       SCHED:
         type: boolean
-        description: "Should we add Windspeed Driver 1.0?"
+        description: "Add Windspeed / Fengchi Kernel Driver?"
         required: true
         default: true
       ZRAM:
         type: boolean
-        description: "Should we add more ZRAM algorithms?"
+        description: "Add More ZRAM Algorithms?"
         required: true
         default: true
       XUS_FIX:
         type: boolean
-        description: "Should we prevent the generation of 5US error files?"
+        description: "Prevent Generation Of XUS Error Files?"
         required: true
         default: true
       SUSFS_DEV:
         type: boolean
-        description: "Should we pull the SUSFS-DEV branch?"
+        description: "Pull SuSFS-DEV Branch?"
         required: true
         default: true
       SPACE_NOCLEAN:
         type: boolean
-        description: "Should we disable space cleaning?"
+        description: "Disable Space Cleaning?"
         required: true
         default: false
       BUILD_NOCCACHE:
         type: boolean
-        description: "Should we disable Ccache?"
+        description: "Disable Ccache?"
         required: true
         default: false
 
 jobs:
   build:
-    name: Build ReSukiSU
+    name: Build ReSukiSU Main
     runs-on: ubuntu-latest
     env:
       CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
@@ -189,7 +189,7 @@ jobs:
           remove-haskell: 'true'
           remove-codeql: 'true'
 
-      - name: Extract Manifest Info
+      - name: Extract Manifest Information
         id: extract_info
         env:
           FILE: ${{ github.event.inputs.FILE }}
@@ -209,7 +209,7 @@ jobs:
           echo "FILE_CONF=$FILE_CONF" >> $GITHUB_ENV
           echo "FILE_BASE=$FILE_BASE" >> $GITHUB_ENV
 
-          # Dynamically calling source code manifest repository, repository priority：1️⃣ KingMikhail-OnePlusOSS → 2️⃣ KingMikhail(Replaceable)
+          # Dynamically Calling Source Code Manifest Repository, Repository Priority: KingMikhail-OnePlusOSS → KingMikhail (Replaceable)
           DYNAMIC_REPO_INPUT="${{ github.event.inputs.DYNAMIC_REPO }}"
           declare -A REPOS
           REPOS["kingmikhail"]="https://api.github.com/repos/kingmikhail/kernel_manifest"
@@ -222,17 +222,17 @@ jobs:
             local OWNER=$1
             local REPO_URL=$2
 
-            echo "🌐 Try to pull the ${OWNER} branch list..."
+            echo "Trying To Pull The ${OWNER} Branch List..."
             BRANCHES=$(curl -fsL ${REPO_URL}/branches | jq -r 'if type=="array" then .[].name else empty end' 2>/dev/null || true)
             if [[ -z "$BRANCHES" ]]; then
-              echo "⚠️ Failed to retrieve the ${OWNER} branch list. Please try rerunning the workflow"
+              echo "Failed to Retrieve the ${OWNER} Branch List, Try Rerunning the Workflow"
               return 1
             fi
             for BRANCH in $BRANCHES; do
               XML_URL="https://raw.githubusercontent.com/${OWNER}/kernel_manifest/$BRANCH/${FILE}.xml"
               README_URL="https://raw.githubusercontent.com/${OWNER}/kernel_manifest/$BRANCH/README.md"
               if curl -sf --head "$XML_URL" > /dev/null; then
-                echo "✅ Locate ${FILE}.xml within ${OWNER} (branch: $BRANCH)"
+                echo "Locate ${FILE}.xml Within ${OWNER} (branch: $BRANCH)"
                 curl -s -o "$XML_PATH" "$XML_URL"
                 curl -s -o "$README_PATH" "$README_URL" || true
                 FOUND_REPO="$OWNER"
@@ -243,13 +243,13 @@ jobs:
             return 1
           }
 
-          # Default repository for file search
+          # Default Repository File Search
           if check_repo "kingmikhail" "${REPOS["kingmikhail"]}"; then
             echo "MANIFEST_REPO=kingmikhail" >> $GITHUB_ENV
             echo "MANIFEST_BRANCH=$FOUND_BRANCH" >> $GITHUB_ENV
           fi
 
-          # Dynamic repository file search
+          # Dynamic Repository File Search
           if [[ -z "$FOUND_REPO" ]]; then
             DYNAMIC_URL="${REPOS["Dynamic"]}"
             DYNAMIC_OWNER=$(echo "$DYNAMIC_URL" | sed -E 's#https://api.github.com/repos/([^/]+)/.*#\1#')
@@ -260,44 +260,44 @@ jobs:
           fi
 
           if [[ -z "$FOUND_REPO" || ! -s "$XML_PATH" ]]; then
-            echo "❌ Unable to find ${FILE}.xml in the dynamic repository"
+            echo "Unable to Find ${FILE}.xml in the Dynamic Repository"
             exit 1
           fi
 
-          # Parse the revision string
+          # Parse The Revision String
           REVISION=$(grep -oP '<project[^>]+revision="\K[^"]+' "$XML_PATH" | head -n1 || true)
           echo "Parse the file to obtain CPU and Android version..."
           # Extract CPU
           CPU=$(echo "$REVISION" | sed -E 's#^(oneplus|realme|oppo)/([^_]+).*#\2#')
-          # Extract Android version
+          # Extract Android Version
           ANDROID_VERSION=$(echo "$REVISION" | grep -oP '\d{1,2}\.\d{1,2}(\.\d{1,2})?')
           if [[ -n "$CPU" && -n "$ANDROID_VERSION" ]]; then
-            echo "✅ CPU=$CPU, ANDROID_VERSION=$ANDROID_VERSION"
+            echo "CPU=$CPU, ANDROID_VERSION=$ANDROID_VERSION"
             echo "CPU=$CPU" >> $GITHUB_ENV
             echo "ANDROID_VERSION=$ANDROID_VERSION" >> $GITHUB_ENV
             # Get short Android version number
             echo "ANDROID_SHORT_VERSION=${ANDROID_VERSION%%.*}" >> $GITHUB_ENV
           else
-            echo "❌ Unable to extract CPU or Android version from revision"
+            echo "Unable to Extract CPU or Android Version from Revision"
             exit 1
           fi
 
-          echo "Parse README.md to obtain CPUD and build method..."
+          echo "Parse README.md to Obtain CPUD and Build Method..."
           if [[ -s "$README_PATH" ]]; then
             BUILD_LINE=$(grep -m1 'oplus_build_kernel.sh' "$README_PATH" || true)
             if [[ -n "$BUILD_LINE" ]]; then
               CPUD=$(echo "$BUILD_LINE" | awk '{print $(NF-1)}')
               BUILD_METHOD=$(echo "$BUILD_LINE" | awk '{print $NF}')
-              echo "✅ CPUD=$CPUD, BUILD_METHOD=$BUILD_METHOD"
+              echo "CPUD=$CPUD, BUILD_METHOD=$BUILD_METHOD"
               echo "CPUD=$CPUD" >> $GITHUB_ENV
               echo "BUILD_METHOD=$BUILD_METHOD" >> $GITHUB_ENV
             else
-              echo "❌ The build command was not found in README.md"
+              echo "The Build Command was Not Found in README.md"
             fi
           else
-            echo "❌ Download failed or is empty for README.md"
+            echo "Download Failed or is Empty for README.md"
           fi
-          # Convey combined information
+          # Convey Combined Information
           echo "value=${FILE_BASE}_Android${ANDROID_VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Debug Show Selected Inputs
@@ -333,7 +333,7 @@ jobs:
       - name: Check Disk Space
         run: df -h
 
-      - name: Create and Enable 3G Swap
+      - name: Create And Enable 3G Swap
         run: |
           sudo swapoff -a
           sudo fallocate -l 3G /swapfile
@@ -349,7 +349,7 @@ jobs:
           mkdir -p "$HOME/.ccache_${{ github.event.inputs.FILE }}"
           echo "set: $HOME/.ccache_${{ github.event.inputs.FILE }}"
 
-      - name: Configure Git
+      - name: Configure Git Configuration
         run: |
           git config --global user.name "kingmikhail"
           git config --global user.email "andreimikhail1987@gmail.com"
@@ -377,12 +377,12 @@ jobs:
               mkdir -p "${{ env.CCACHE_DIR }}"
               ccache -M ${{ env.CCACHE_MAXSIZE }}
               touch "$INIT_FLAG"
-              echo "✅ Ccache initialization complete"
+              echo "Ccache initialization complete"
             else
-              echo "✅ Ccache has been initialized, skip this step"
+              echo "Ccache has been initialized, skip this step"
             fi
           else
-            echo "❌ Skip if Ccache is not installed"
+            echo "Skip if Ccache is not installed"
           fi
           ccache -s
 
@@ -850,7 +850,7 @@ jobs:
           echo "CONFIG_KSU=y" >> "$CONFIG_FILE"
 
           # KernelPatchModule Configuration
-          if [ "${{ github.event.inputs.KPM }}" = "KPM" ] || [ "${{ github.event.inputs.KPM }}" = "NoN" ]; then
+          if [ "${{ github.event.inputs.KPM }}" = "KPM" ] || [ "${{ github.event.inputs.KPM }}" = "None" ]; then
             echo "CONFIG_KPM=y" >> "$CONFIG_FILE"
           fi
           if [ "${{ github.event.inputs.KPM }}" = "KPN" ]; then
@@ -1013,9 +1013,9 @@ jobs:
           # Read Clang prebuilt bin from build.config.common
           CLANG_PREBUILT_BIN=$(grep '^CLANG_PREBUILT_BIN=' ./common/build.config.common | cut -d'=' -f2 || true)
           if [[ -z "$CLANG_PREBUILT_BIN" ]]; then
-            echo "⚠️ Clang prebuilt bin was not found in build.config.common. Revert to the official build script"
+            echo "Clang Prebuilt Bin was Not Found in Build Config Common, Revert to the Official Build Script"
             echo "fallback=true" >> "$GITHUB_OUTPUT"
-            echo "Please consider disabling fast build and submit an issue"
+            echo "Please Consider Disabling Fast Build and Submit an Issue"
             exit 0
           fi
 
@@ -1030,9 +1030,9 @@ jobs:
           fi
 
           if [[ -z "$CLANG_VERSION" ]]; then
-            echo "⚠️ Unable to obtain the Clang version from Clang prebuilt bin or build.config.constants; reverting to the official build script"
+            echo "Unable to Obtain the Clang Version from Clang Prebuilt Bin or Build Config Constants, Reverting to the Official Build Script"
             echo "fallback=true" >> "$GITHUB_OUTPUT"
-            echo "Please consider disabling fast build and submit an issue"
+            echo "Please Consider Disabling Fast Build and Submit an Issue"
             exit 0
           fi
 
@@ -1043,10 +1043,10 @@ jobs:
           # Get the parent directory name of Clang prebuilt bin and assign it to Clang path
           CLANG_PATH=$(basename "$(dirname "$CLANG_PREBUILT_BIN")")
 
-          echo "✅ CLANG_VERSION=$CLANG_VERSION"
-          echo "✅ CLANG_DIR=$CLANG_DIR"
-          echo "✅ CLANG_PATH=$CLANG_PATH"
-          echo "✅ USE_LLVM_IAS=$USE_LLVM_IAS"
+          echo "CLANG_VERSION=$CLANG_VERSION"
+          echo "CLANG_DIR=$CLANG_DIR"
+          echo "CLANG_PATH=$CLANG_PATH"
+          echo "USE_LLVM_IAS=$USE_LLVM_IAS"
 
           export PATH="$GITHUB_WORKSPACE/kernel_workspace/kernel_platform/$CLANG_PREBUILT_BIN:$PATH"
           export PATH="/usr/lib/ccache:$PATH"
@@ -1195,16 +1195,16 @@ jobs:
               grep "browser_download_url" | grep "ZRAM-Module-.*\.zip" | cut -d '"' -f 4 | head -n 1)
 
             if [ -n "$download_url" ]; then
-              echo "✅ Download link successfully obtained: $download_url"
+              echo "Download link successfully obtained: $download_url"
               wget -N "$download_url" && success=1 && break
             else
-              echo "⚠️ Failed to retrieve download link, please try again in 3 seconds..."
+              echo "Failed to Retrieve Download Link, Try again in 3 Seconds..."
               sleep 3
             fi
           done
 
           if [ "$success" -ne 1 ]; then
-            echo "❌ Unable to obtain the ZRAM module download link after $retries of consecutive attempts"
+            echo "Unable to Obtain the ZRAM Module Download Link after $retries of Consecutive Attempts"
             echo "upload=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
