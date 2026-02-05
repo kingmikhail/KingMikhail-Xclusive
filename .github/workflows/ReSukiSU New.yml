@@ -1,4 +1,4 @@
-name: ReSukiSU New
+name: KingMikhail ReSukiSU New
 on:
   workflow_dispatch:
     inputs:
@@ -167,7 +167,7 @@ on:
 
 jobs:
   build:
-    name: Build ReSukiSU
+    name: KingMikhail ReSukiSU
     runs-on: ubuntu-latest
     env:
       CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
@@ -592,7 +592,7 @@ jobs:
           echo "manager_branch=$BRANCH" >> "$GITHUB_OUTPUT"
           echo "manager_artifact=$ARTIFACT" >> "$GITHUB_OUTPUT"
 
-      - name: Add ReSukiSU
+      - name: Add KingMikhail ReSukiSU
         run: |
           cd kernel_workspace/kernel_platform
           MANAGER_BRANCH="${{ steps.manager.outputs.manager_branch }}"
@@ -611,7 +611,7 @@ jobs:
           [[ -n "$CUSTOM_TAG" ]] && echo "Custom version identification: $CUSTOM_TAG" || echo "Custom version identifier: Not enabled"
           [[ -n "$MANUAL_HASH" ]] && echo "Manually specify hash: $MANUAL_HASH" || echo "Manually specify hash: Not enabled"
 
-          curl -LSs "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/refs/heads/new-manager/kernel/setup.sh" | bash -s new-manager
+          curl -LSs "https://raw.githubusercontent.com/kingmikhail/ReSukiSU/refs/heads/new-manager/kernel/setup.sh" | bash -s new-manager
           cd ./KernelSU
 
           # If a manual hash was specified, switch to this commit
@@ -621,7 +621,7 @@ jobs:
             SHORT_HASH=${MANUAL_HASH:0:8}
           fi
 
-          KSU_API_VERSION=$(curl -fsSL "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/refs/heads/new-manager/kernel/Kbuild" | \
+          KSU_API_VERSION=$(curl -fsSL "https://raw.githubusercontent.com/kingmikhail/ReSukiSU/refs/heads/new-manager/kernel/Kbuild" | \
             grep -m1 "KSU_VERSION_API :=" | awk -F'= ' '{print $2}' | tr -d '[:space:]')
           if [[ -z "$KSU_API_VERSION" || "$(printf '%s\n' "$KSU_API_VERSION" "3.1.7" | sort -V | head -n1)" != "3.1.7" ]]; then
             KSU_API_VERSION="3.1.7"
@@ -672,7 +672,7 @@ jobs:
           grep "KSU_VERSION_FULL" kernel/Kbuild
           echo "::endgroup::"
 
-      - name: Apply Patches ReSukiSU
+      - name: Patches KingMikhail ReSukiSU
         env:
           FILE: ${{ github.event.inputs.FILE }}
         run: |
@@ -783,7 +783,7 @@ jobs:
           patch -p1 -F 3 < "${PATCH_DIR}/HMBIRD" || true
           echo "OGKI to GKI patch conversion complete"
 
-      - name: Apply Unicode Bypass
+      - name: Unicode Bypass
         if: ${{ github.event.inputs.UNICODE_BYPASS == 'true' }}
         run: |
           PATCH_DIR="${GITHUB_WORKSPACE}/kernel_workspace/KingMikhail-Xclusive/Patches"
@@ -794,7 +794,7 @@ jobs:
             patch -p1 --forward < "${PATCH_DIR}/Unicode-6.1-P" || true
           fi
 
-      - name: Apply ZRAM
+      - name: ZRAM ALGORITHM
         if: ${{ github.event.inputs.ZRAM == 'true' }}
         run: |
           PATCH_DIR="${GITHUB_WORKSPACE}/kernel_workspace/SukiSU_patch/other/zram/zram_patch/${{ env.KERNEL_VERSION }}"
@@ -806,7 +806,7 @@ jobs:
           patch -p1 -F 3 < "${PATCH_DIR}/lz4k_oplus.patch" || true
           echo 'LZ4K OnePlus complete'
 
-      - name: APPLYING FENGCHI KERNEL
+      - name: FENGCHI KERNEL
         env:
           FILE: ${{ github.event.inputs.FILE }}
         if: ${{ github.event.inputs.SCHED == 'true' }}
@@ -831,25 +831,25 @@ jobs:
             exit 12
           fi
 
-      - name: Apply LSM BBG
+      - name: LSM BBG
         if: ${{ github.event.inputs.LSM == 'true' }}
         run: |
           cd kernel_workspace/kernel_platform/common
-          echo "Enabling Kernel-level baseband protection support..."
+          echo "Enabling Kernel-Level Baseband Protection Support..."
           curl -LSs https://raw.githubusercontent.com/vc-teahouse/Baseband-guard/main/setup.sh | bash -s fix_blkdev_rename
           sed -i '/^config LSM$/,/^help$/{ /^[[:space:]]*default/ { /baseband_guard/! s/selinux/selinux,baseband_guard/ } }' ./security/Kconfig
 
-      # Configuration information, marked with * indicates additional items, which carry a certain degree of risk and uncertainty
+      # Configuration Information, Marked With An Asterisk Indicates Additional Items, Which Carry A Certain Degree Of Risk And Uncertainty
       - name: Add Configuration Settings
         run: |
           cd kernel_workspace/kernel_platform/common
           CONFIG_FILE=./arch/arm64/configs/gki_defconfig
           KERNEL_VERSION="${{ env.KERNEL_VERSION }}"
 
-          # ReSukiSU Config
+          # KingMikhail ReSukiSU Configuration
           echo "CONFIG_KSU=y" >> "$CONFIG_FILE"
 
-          # KPM Config
+          # KPM Configuration
           if [ "${{ github.event.inputs.KPM }}" = "KPM" ] || [ "${{ github.event.inputs.KPM }}" = "NoN" ]; then
             echo "CONFIG_KPM=y" >> "$CONFIG_FILE"
           fi
@@ -857,7 +857,7 @@ jobs:
             echo "CONFIG_KPM=n" >> "$CONFIG_FILE"
           fi
 
-          # SUSFS Config
+          # SuSFS Configuration
           if [ "${{ github.event.inputs.SUSFS_META }}" != "-1" ]; then
             echo "CONFIG_KSU_SUSFS=y" >> "$CONFIG_FILE"
             echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> "$CONFIG_FILE"
@@ -873,11 +873,11 @@ jobs:
             echo "CONFIG_KSU_SUSFS=n" >> "$CONFIG_FILE"
           fi
 
-          # TMPFS Config*
+          # TMPFS Configuration*
           echo "CONFIG_TMPFS_XATTR=y" >> "$CONFIG_FILE"
           echo "CONFIG_TMPFS_POSIX_ACL=y" >> "$CONFIG_FILE"
 
-          # BBR & ECN Config*
+          # BBR & ECN Configuration*
           if [ "${{ github.event.inputs.BBR_ECN }}" = "true" ]; then
             echo "CONFIG_TCP_CONG_ADVANCED=y" >> "$CONFIG_FILE"
             echo "CONFIG_TCP_CONG_BBR=y" >> "$CONFIG_FILE"
@@ -891,7 +891,7 @@ jobs:
             echo "CONFIG_IP_NF_TARGET_ECN=y" >> "$CONFIG_FILE"
           fi
 
-          # ZRAM Config*
+          # ZRAM Configuration*
           if [ "${{ github.event.inputs.ZRAM }}" = "true" ]; then
             echo "CONFIG_CRYPTO_LZ4HC=y" >> "$CONFIG_FILE"
             echo "CONFIG_CRYPTO_LZ4K=y" >> "$CONFIG_FILE"
@@ -901,12 +901,12 @@ jobs:
             echo "CONFIG_ZRAM_WRITEBACK=y" >> "$CONFIG_FILE"
           fi
 
-          # LSM Config*
+          # LSM BBG Configuration*
           if [ "${{ github.event.inputs.LSM }}" = "true" ]; then
             echo "CONFIG_BBG=y" >> "$CONFIG_FILE"
           fi
 
-          # IPSET & IPV6 NAT Config*
+          # IPSET & IPV6 NAT Configuration*
           if [[ "${CPU}" == sm* && "${{ github.event.inputs.NETFILTER }}" == "true" ]]; then
             echo "CONFIG_BPF_STREAM_PARSER=y" >> "$CONFIG_FILE"
             echo "CONFIG_NETFILTER_XT_MATCH_ADDRTYPE=y" >> "$CONFIG_FILE"
@@ -941,7 +941,7 @@ jobs:
           # Remove build review
           sed -i 's/check_defconfig//' ./build.config.gki
 
-      - name: Fix IPV6 Nat Error
+      - name: IPV6 NAT ERROR
         if: ${{ github.event.inputs.NETFILTER == 'true' }}
         run: |
           PATCH_DIR="${GITHUB_WORKSPACE}/kernel_workspace/KingMikhail-Xclusive/Patches"
@@ -953,7 +953,7 @@ jobs:
             echo "Your device does not support IPV6 NAT, skip this step"
           fi
 
-      # Custom kernel build time, without adding #1 SMP PREEMPT
+      # Custom Kernel Build Time, Without Adding #1 SMP PREEMPT
       - name: Custom Build Time
         shell: bash
         run: |
@@ -979,7 +979,7 @@ jobs:
             fi
           done
 
-      - name: Enable LTO=Thin For Fast
+      - name: LTO THIN FOR FAST
         if: ${{ (env.KERNEL_VERSION == '5.10' || env.KERNEL_VERSION == '5.15') && github.event.inputs.FAST_BUILD == 'true' }}
         run: |
           cd kernel_workspace/kernel_platform
@@ -990,13 +990,13 @@ jobs:
           sed -i 's/^CONFIG_LTO_CLANG_NONE=y/CONFIG_LTO_CLANG_THIN=y/' "$DEFCONFIG"
           grep -q '^CONFIG_LTO_CLANG_THIN=y' "$DEFCONFIG" || echo 'CONFIG_LTO_CLANG_THIN=y' >> "$DEFCONFIG"
 
-      - name: Disable GPUEB
+      - name: DISABLE GPUEB
         if: ${{ env.KERNEL_VERSION == '5.10' && startsWith(env.CPU, 'mt') }}
         run: |
           echo "Disabling GPUEB for MTK kernel 5.10"
           sed -i '/obj-y.*gpueb/d' kernel_workspace/kernel-5.10/drivers/gpu/mediatek/Makefile
 
-      - name: Build Kernel FAST
+      - name: FAST KERNEL BUILD
         if: ${{ github.event.inputs.FAST_BUILD == 'true' }}
         id: fast_build
         run: |
@@ -1010,7 +1010,7 @@ jobs:
             USE_LLVM_IAS=false
           fi
 
-          # Read Clang prebuilt bin from build.config.common
+          # Read Clang Prebuilt Bin From Build Common
           CLANG_PREBUILT_BIN=$(grep '^CLANG_PREBUILT_BIN=' ./common/build.config.common | cut -d'=' -f2 || true)
           if [[ -z "$CLANG_PREBUILT_BIN" ]]; then
             echo "⚠️ Clang prebuilt bin was not found in build.config.common. Revert to the official build script"
@@ -1019,28 +1019,28 @@ jobs:
             exit 0
           fi
 
-          # Try extracting the Clang-r version from Clang prebuilt bin first
+          # Try Extracting The Clang-r Version From Clang Prebuilt Bin First
           if [[ "$CLANG_PREBUILT_BIN" =~ (clang-r[0-9a-z]+) ]]; then
             CLANG_VERSION="${BASH_REMATCH[1]}"
           else
-            # If no match is found, try extracting from build.config.constants
+            # If No Match is Found, Try Extracting From Contants
             if [[ -f ./common/build.config.constants ]]; then
               CLANG_VERSION=$(grep '^CLANG_VERSION=' ./common/build.config.constants | cut -d'=' -f2 || true)
             fi
           fi
 
           if [[ -z "$CLANG_VERSION" ]]; then
-            echo "⚠️ Unable to obtain the Clang version from Clang prebuilt bin or build.config.constants; reverting to the official build script"
+            echo "Unable To Obtain The Clang version From Clang Prebuilt Bin, Reverting To The Official Build Script"
             echo "fallback=true" >> "$GITHUB_OUTPUT"
             echo "Please consider disabling fast build and submit an issue"
             exit 0
           fi
 
-          # Replace with the new Clang version value
+          # Replace With The New Clang Version Value
           CLANG_PREBUILT_BIN=${CLANG_PREBUILT_BIN/\$\{CLANG_VERSION\}/$CLANG_VERSION}
-          # Get the first directory name of Clang prebuilt bin and assign it to Clang dir
+          # Get The First Directory Name Of Clang Prebuilt Bin And Assign It To Clang Dir
           CLANG_DIR=$(echo "$CLANG_PREBUILT_BIN" | cut -d'/' -f1)
-          # Get the parent directory name of Clang prebuilt bin and assign it to Clang path
+          # Get The Parent Directory Name Of Clang Prebuilt Bin And Assign It To Clang Path
           CLANG_PATH=$(basename "$(dirname "$CLANG_PREBUILT_BIN")")
 
           echo "✅ CLANG_VERSION=$CLANG_VERSION"
@@ -1067,7 +1067,7 @@ jobs:
           make -j$(nproc --all) O=out $MAKE_ARGS
           ccache -s
 
-      - name: Fallback To Build Kernel
+      - name: FALLBACK TO KERNEL BUILD
         if: ${{ github.event.inputs.FAST_BUILD == 'false' || steps.fast_build.outputs.fallback == 'true' }}
         run: |
           cd kernel_workspace
@@ -1079,7 +1079,7 @@ jobs:
             ./kernel_platform/oplus/build/oplus_build_kernel.sh ${{ env.CPUD }} ${{ env.BUILD_METHOD }}
           fi
 
-      - name: Make AnyKernel3
+      - name: MAKE ANYKERNEL3
         run: |
           git clone https://github.com/kingmikhail/AnyKernel3 --depth=1
           rm -rf ./AnyKernel3/.git
@@ -1115,7 +1115,7 @@ jobs:
           mv oImage Image
           cp Image "${GITHUB_WORKSPACE}/AnyKernel3/Image"
 
-      - name: Download Latest SUSFS Module From CI
+      - name: DOWNLOAD LATEST SUSFS MODULE FROM CI
         if: ${{ github.event.inputs.SUSFS_CI == 'CI' && github.event.inputs.SUSFS_META != '-1' }}
         continue-on-error: true
         run: |
@@ -1135,14 +1135,14 @@ jobs:
             fi
           fi
 
-      - name: Download Latest SUSFS Module From Release
+      - name: DOWNLOAD LATEST SUSFS MODULE FROM RELEASE
         if: ${{ github.event.inputs.SUSFS_CI == 'Release' && github.event.inputs.SUSFS_META != '-1' }}
         continue-on-error: true
         run: |
           wget -O ksu_module_susfs_1.5.2+_Release.zip https://github.com/sidex15/ksu_module_susfs/releases/latest/download/ksu_module_susfs_1.5.2+.zip
           cp ksu_module_susfs_1.5.2+_Release.zip ./AnyKernel3/
 
-      - name: Download Latest ReSukiSU APK From CI
+      - name: DOWNLOAD LATEST KING RESUKISU APK FROM CI
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -1153,13 +1153,13 @@ jobs:
           echo "Using branch: $MANAGER_BRANCH"
           echo "Downloading artifact: $MANAGER_ARTIFACT"
 
-          run_id=$(gh api "repos/ReSukiSU/ReSukiSU/actions/workflows/build-manager.yml/runs?branch=new-manager&status=success&per_page=1" --jq '.workflow_runs[0].id' || echo "")
+          run_id=$(gh api "repos/kingmikhail/ReSukiSU/actions/workflows/build-manager.yml/runs?branch=new-manager&status=success&per_page=1" --jq '.workflow_runs[0].id' || echo "")
 
           if [[ -z "$run_id" ]]; then
             echo "No successful workflow run found on branch $MANAGER_BRANCH. Skipping download."
             exit 0
           fi
-          artifact_url=$(gh api "repos/ReSukiSU/ReSukiSU/actions/runs/$run_id/artifacts" | jq -r ".artifacts[] | select(.name == \"$MANAGER_ARTIFACT\") | .archive_download_url" | head -n1)
+          artifact_url=$(gh api "repos/kingmikhail/ReSukiSU/actions/runs/$run_id/artifacts" | jq -r ".artifacts[] | select(.name == \"$MANAGER_ARTIFACT\") | .archive_download_url" | head -n1)
 
           if [[ -z "$artifact_url" ]]; then
             echo "No artifact '$MANAGER_ARTIFACT' found in run $run_id. Skipping download."
@@ -1169,42 +1169,42 @@ jobs:
           curl -fL -H "Authorization: token $GITHUB_TOKEN" -o "${MANAGER_ARTIFACT}.zip" "$artifact_url"
           unzip -j "${MANAGER_ARTIFACT}.zip" "*.apk" -d ./AnyKernel3/
 
-      - name: Set Zip Suffix
+      - name: ZIP SUFFIX
         id: suffix
         run: |
           echo "value=${{ github.event.inputs.ZRAM == 'true' && '_LZ4KD' || '' }}${{ github.event.inputs.KPM == 'KPM' && '_KPM' || github.event.inputs.KPM == 'KPN' && '_KPN' || '' }}${{ github.event.inputs.LSM == 'true' && '_LSM' || '' }}_ILH${{ github.event.inputs.SCHED== 'true' && '_SCHED' || '' }}" >> $GITHUB_OUTPUT
 
-      - name: Upload AnyKernel3
+      - name: UPLOAD ANYKERNEL3
         uses: actions/upload-artifact@v4
         with:
-          name: AK3-ReSukiSU-${{ env.KSUVER }}
+          name: AK3-King-ReSukiSU-${{ env.KSUVER }}
           path: ./AnyKernel3/*
 
-      - name: Download And Unzip ZRAM
+      - name: DOWNLOAD AND UNZIP ZRAM
         if: ${{ github.event.inputs.ZRAM == 'true' }}
         id: zram_find
         run: |
           set -e
           sudo apt install -y unzip
-          echo "尝试获取 ZRAM 模块 zip 下载链接..."
+          echo "Try To Get The ZRAM Module Zip Download Link..."
           retries=3
           success=0
           for i in $(seq 1 $retries); do
-            echo "第 $i 次尝试下载..."
+            echo "The $i Attempt To Download..."
             download_url=$(curl -s https://api.github.com/repos/FurLC/ZRAM-Module/releases/latest | \
               grep "browser_download_url" | grep "ZRAM-Module-.*\.zip" | cut -d '"' -f 4 | head -n 1)
 
             if [ -n "$download_url" ]; then
-              echo "✅ Download link successfully obtained: $download_url"
+              echo "Download Link Successfully Obtained $download_url"
               wget -N "$download_url" && success=1 && break
             else
-              echo "⚠️ Failed to retrieve download link, please try again in 3 seconds..."
+              echo "Failed To Retrieve Download Link, Please Try Again In 3 Seconds..."
               sleep 3
             fi
           done
 
           if [ "$success" -ne 1 ]; then
-            echo "❌ Unable to obtain the ZRAM module download link after $retries of consecutive attempts"
+            echo "Unable To Obtain The ZRAM Module Download Link After $retries Of Consecutive Attempts"
             echo "upload=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -1233,17 +1233,17 @@ jobs:
               echo "If the source file and target path are the same, skip copying"
             fi
           else
-            echo "The ZRAM.ko file was not found, possibly due to an unsupported kernel version or an unsuccessful build"
+            echo "The ZRAM.ko File Was Not Found, Possibly Due To An Unsupported Kernel Version Or An Unsuccessful Build"
             echo "upload=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-      - name: Upload ZRAM Module
+      - name: UPLOAD ZRAM MODULE
         if: ${{ github.event.inputs.ZRAM == 'true' && steps.zram_find.outputs.upload != 'false' }}
         uses: actions/upload-artifact@v4
         with:
           name: ZRAM-Module_${{ env.KERNEL_VERSION }}_${{ steps.extract_info.outputs.value }}
           path: ZRAM-Module/*
 
-      - name: Post-build Disk Check
+      - name: POST BUILD DISC CHECK
         run: df -h
