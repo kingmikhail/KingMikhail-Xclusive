@@ -1,4 +1,4 @@
-name: New Manager ReSukiSU
+name: New King ReSukiSU
 on:
   workflow_dispatch:
     inputs:
