@@ -1,4 +1,4 @@
-name: ReSukiSU New
+name: New Manager ReSukiSU
 on:
   workflow_dispatch:
     inputs:
@@ -167,7 +167,7 @@ on:
 
 jobs:
   build:
-    name: Build ReSukiSU Main
+    name: New Manager ReSukiSU
     runs-on: ubuntu-latest
     env:
       CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
