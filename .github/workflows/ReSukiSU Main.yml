@@ -4,7 +4,7 @@ on:
     inputs:
       FILE:
         type: choice
-        description: "Configuration file"
+        description: "Configuration File"
         required: true
         default: oneplus_13_b
         options:
@@ -54,17 +54,17 @@ on:
           - oneplus_15
       MANAGER_SOURCE:
         type: choice
-        description: "Manager calling direction"
+        description: "Manager Calling Direction"
         required: true
-        default: OFFICIAL
+        default: Official
         options:
-          - OFFICIAL
-          - SPOOF
-          - NEW
-          - NEW-SPOOF
+          - Official
+          - Official-Spoof
+          - New
+          - New-Spoof
       SUSFS_CI:
         type: choice
-        description: "SUSFS module download call direction"
+        description: "SUSFS Module Download Call Direction"
         required: true
         default: NoN
         options:
@@ -571,19 +571,19 @@ jobs:
           MANAGER_SOURCE="${{ github.event.inputs.MANAGER_SOURCE }}"
 
           case "$MANAGER_SOURCE" in
-            NEW-SPOOF)
+            New-Spoof)
               BRANCH="new-manager"
               ARTIFACT="Spoofed-Manager-release"
               ;;
-            NEW)
+            New)
               BRANCH="new-manager"
               ARTIFACT="Manager-release"
               ;;
-            SPOOF)
+            Official-Spoof)
               BRANCH="main"
               ARTIFACT="Spoofed-Manager-release"
               ;;
-            OFFICIAL|*)
+            Official|*)
               BRANCH="main"
               ARTIFACT="Manager-release"
               ;;
