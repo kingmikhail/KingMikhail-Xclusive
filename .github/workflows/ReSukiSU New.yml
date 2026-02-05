@@ -611,7 +611,7 @@ jobs:
           [[ -n "$CUSTOM_TAG" ]] && echo "Custom version identification: $CUSTOM_TAG" || echo "Custom version identifier: Not enabled"
           [[ -n "$MANUAL_HASH" ]] && echo "Manually specify hash: $MANUAL_HASH" || echo "Manually specify hash: Not enabled"
 
-          curl -LSs "https://raw.githubusercontent.com/kingmikhail/ReSukiSU/refs/heads/new-manager/kernel/setup.sh" | bash -s new-manager
+          curl -LSs "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/refs/heads/new-manager/kernel/setup.sh" | bash -s new-manager
           cd ./KernelSU
 
           # If a manual hash was specified, switch to this commit
@@ -621,7 +621,7 @@ jobs:
             SHORT_HASH=${MANUAL_HASH:0:8}
           fi
 
-          KSU_API_VERSION=$(curl -fsSL "https://raw.githubusercontent.com/kingmikhail/ReSukiSU/refs/heads/new-manager/kernel/Kbuild" | \
+          KSU_API_VERSION=$(curl -fsSL "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/refs/heads/new-manager/kernel/Kbuild" | \
             grep -m1 "KSU_VERSION_API :=" | awk -F'= ' '{print $2}' | tr -d '[:space:]')
           if [[ -z "$KSU_API_VERSION" || "$(printf '%s\n' "$KSU_API_VERSION" "3.1.7" | sort -V | head -n1)" != "3.1.7" ]]; then
             KSU_API_VERSION="3.1.7"
@@ -1153,13 +1153,13 @@ jobs:
           echo "Using branch: $MANAGER_BRANCH"
           echo "Downloading artifact: $MANAGER_ARTIFACT"
 
-          run_id=$(gh api "repos/kingmikhail/ReSukiSU/actions/workflows/build-manager.yml/runs?branch=new-manager&status=success&per_page=1" --jq '.workflow_runs[0].id' || echo "")
+          run_id=$(gh api "repos/ReSukiSU/ReSukiSU/actions/workflows/build-manager.yml/runs?branch=new-manager&status=success&per_page=1" --jq '.workflow_runs[0].id' || echo "")
 
           if [[ -z "$run_id" ]]; then
             echo "No successful workflow run found on branch $MANAGER_BRANCH. Skipping download."
             exit 0
           fi
-          artifact_url=$(gh api "repos/kingmikhail/ReSukiSU/actions/runs/$run_id/artifacts" | jq -r ".artifacts[] | select(.name == \"$MANAGER_ARTIFACT\") | .archive_download_url" | head -n1)
+          artifact_url=$(gh api "repos/ReSukiSU/ReSukiSU/actions/runs/$run_id/artifacts" | jq -r ".artifacts[] | select(.name == \"$MANAGER_ARTIFACT\") | .archive_download_url" | head -n1)
 
           if [[ -z "$artifact_url" ]]; then
             echo "No artifact '$MANAGER_ARTIFACT' found in run $run_id. Skipping download."
