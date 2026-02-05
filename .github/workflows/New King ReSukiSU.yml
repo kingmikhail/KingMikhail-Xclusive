@@ -99,7 +99,7 @@ on:
         type: string
         description: "Branch Name (required) / Custom Version Identifier (Leave Blank And Do Not Modify) / Revert Branch Commit Hash Version (Leave Blank And Do Not Modify)"
         required: false
-        default: "main/KingMikhail/"
+        default: "new-manager/KingMikhail/"
       SUFFIX:
         type: string
         description: "Custom Kernel Suffix (Use Random String If Not Specified)"
@@ -143,17 +143,17 @@ on:
         type: boolean
         description: "Add More ZRAM Algorithms?"
         required: true
-        default: true
+        default: false
       XUS_FIX:
         type: boolean
         description: "Prevent Generation Of XUS Error Files?"
         required: true
-        default: true
+        default: false
       SUSFS_DEV:
         type: boolean
         description: "Pull SuSFS-DEV Branch?"
         required: true
-        default: true
+        default: false
       SPACE_NOCLEAN:
         type: boolean
         description: "Disable Space Cleaning?"
